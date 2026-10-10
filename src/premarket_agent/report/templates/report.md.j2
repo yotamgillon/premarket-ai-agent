@@ -1,0 +1,60 @@
+# Pre-Market Report — {{ report_date.strftime('%A, %B %d, %Y') }}
+
+> {{ r.tldr }}
+
+**Bias:** {{ r.bias | upper }} · **Sentiment:** {{ r.sentiment }}
+
+## Market snapshot
+{% if snapshots %}
+| Instrument | Last | Change | Prior H / L | Overnight H / L | 5-day H / L |
+|---|---:|---:|---:|---:|---:|
+{% for s in snapshots %}| {{ s.name }} (`{{ s.symbol }}`) | {{ num(s.last) }} | {{ signed(s.change) }} ({{ signed(s.change_pct) }}%) | {{ num(s.prior_high) }} / {{ num(s.prior_low) }} | {{ num(s.overnight_high) }} / {{ num(s.overnight_low) }} | {{ num(s.week_high) }} / {{ num(s.week_low) }} |
+{% endfor %}
+{% else %}
+_Price data unavailable._
+{% endif %}
+
+## Overnight summary
+{{ r.overnight_summary }}
+
+## Key levels
+| Instrument | Level | Note |
+|---|---:|---|
+{% for k in r.key_levels %}| {{ k.instrument }} | {{ num(k.level) }} | {{ k.label }} |
+{% endfor %}
+
+## Scheduled events (ET)
+{% if r.scheduled_events %}
+| Time | Event | Impact | Note |
+|---|---|---|---|
+{% for e in r.scheduled_events %}| {{ e.time_et }} | {{ e.event }} | {{ e.impact }} | {{ e.note }} |
+{% endfor %}
+{% else %}
+_No medium/high-impact US events scheduled._
+{% endif %}
+
+## Top news
+{% for h in r.top_news %}
+- **{{ h.title }}** _({{ h.source }})_ — {{ h.why_it_matters }}
+{% endfor %}
+
+## Sentiment: {{ r.sentiment }}
+{{ r.sentiment_rationale }}
+
+## Bias: {{ r.bias }}
+{{ r.bias_rationale }}
+
+## Risks
+{% for risk in r.risks %}
+- {{ risk }}
+{% endfor %}
+{% if r.data_gaps %}
+
+## Data gaps
+{% for gap in r.data_gaps %}
+- {{ gap }}
+{% endfor %}
+{% endif %}
+
+---
+<sub>Generated {{ generated_at.strftime('%Y-%m-%d %H:%M %Z') }} by `{{ model }}`. Research context only — not investment advice.</sub>

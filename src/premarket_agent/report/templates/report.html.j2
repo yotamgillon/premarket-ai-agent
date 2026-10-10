@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-Market Report {{ report_date.isoformat() }}</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e3e3e0;
+    --up: #127a3e; --down: #b3261e; --flat: #6b6b70; --accent: #2a5bd7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #9a9aa2; --border: #2e2e33;
+      --up: #4cc27a; --down: #f0716a; --flat: #9a9aa2; --accent: #8aa9ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { font-size: 22px; margin: 0 0 4px; }
+  header .date { color: var(--muted); margin: 0 0 16px; }
+  .tldr { font-size: 17px; padding: 14px 16px; background: var(--card);
+          border-left: 4px solid var(--accent); border-radius: 6px; margin: 0 0 12px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border);
+          background: var(--card); font-size: 13px; font-weight: 600; text-transform: uppercase; }
+  .bullish, .risk-on { color: var(--up); } .bearish, .risk-off { color: var(--down); }
+  .neutral, .mixed { color: var(--flat); }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+            padding: 14px 16px; margin-bottom: 14px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+       margin: 0 0 10px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left;
+           white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.wrap { white-space: normal; }
+  tr:last-child td { border-bottom: none; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  ul { margin: 0; padding-left: 20px; } li { margin: 4px 0; }
+  .src { color: var(--muted); font-size: 13px; }
+  .gaps { border-color: var(--down); }
+  footer { color: var(--muted); font-size: 12px; margin-top: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Pre-Market Report</h1>
+    <p class="date">{{ report_date.strftime('%A, %B %d, %Y') }} · NQ / ES futures</p>
+  </header>
+
+  <p class="tldr">{{ r.tldr }}</p>
+  <div class="chips">
+    <span class="chip {{ r.bias }}">Bias: {{ r.bias }}</span>
+    <span class="chip {{ r.sentiment }}">Sentiment: {{ r.sentiment }}</span>
+  </div>
+
+  <section>
+    <h2>Market snapshot</h2>
+    {% if snapshots %}
+    <div class="table-wrap"><table>
+      <tr><th>Instrument</th><th class="num">Last</th><th class="num">Change</th>
+          <th class="num">Prior H / L</th><th class="num">Overnight H / L</th><th class="num">5-day H / L</th></tr>
+      {% for s in snapshots %}
+      <tr>
+        <td>{{ s.symbol }}</td>
+        <td class="num">{{ num(s.last) }}</td>
+        <td class="num {{ 'up' if s.change > 0 else 'down' if s.change < 0 else '' }}">{{ signed(s.change) }} ({{ signed(s.change_pct) }}%)</td>
+        <td class="num">{{ num(s.prior_high) }} / {{ num(s.prior_low) }}</td>
+        <td class="num">{{ num(s.overnight_high) }} / {{ num(s.overnight_low) }}</td>
+        <td class="num">{{ num(s.week_high) }} / {{ num(s.week_low) }}</td>
+      </tr>
+      {% endfor %}
+    </table></div>
+    {% else %}<p>Price data unavailable.</p>{% endif %}
+  </section>
+
+  <section>
+    <h2>Overnight summary</h2>
+    <p>{{ r.overnight_summary }}</p>
+  </section>
+
+  <section>
+    <h2>Key levels</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Instrument</th><th class="num">Level</th><th>Note</th></tr>
+      {% for k in r.key_levels %}
+      <tr><td>{{ k.instrument }}</td><td class="num">{{ num(k.level) }}</td><td class="wrap">{{ k.label }}</td></tr>
+      {% endfor %}
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Scheduled events (ET)</h2>
+    {% if r.scheduled_events %}
+    <div class="table-wrap"><table>
+      <tr><th>Time</th><th>Event</th><th>Impact</th><th>Note</th></tr>
+      {% for e in r.scheduled_events %}
+      <tr><td>{{ e.time_et }}</td><td>{{ e.event }}</td><td>{{ e.impact }}</td><td class="wrap">{{ e.note }}</td></tr>
+      {% endfor %}
+    </table></div>
+    {% else %}<p>No medium/high-impact US events scheduled.</p>{% endif %}
+  </section>
+
+  <section>
+    <h2>Top news</h2>
+    <ul>
+      {% for h in r.top_news %}
+      <li><strong>{{ h.title }}</strong> <span class="src">({{ h.source }})</span><br>{{ h.why_it_matters }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section>
+    <h2>Sentiment — <span class="{{ r.sentiment }}">{{ r.sentiment }}</span></h2>
+    <p>{{ r.sentiment_rationale }}</p>
+  </section>
+
+  <section>
+    <h2>Bias — <span class="{{ r.bias }}">{{ r.bias }}</span></h2>
+    <p>{{ r.bias_rationale }}</p>
+  </section>
+
+  <section>
+    <h2>Risks</h2>
+    <ul>{% for risk in r.risks %}<li>{{ risk }}</li>{% endfor %}</ul>
+  </section>
+
+  {% if r.data_gaps %}
+  <section class="gaps">
+    <h2>Data gaps</h2>
+    <ul>{% for gap in r.data_gaps %}<li>{{ gap }}</li>{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  <footer>Generated {{ generated_at.strftime('%Y-%m-%d %H:%M %Z') }} by {{ model }}. Research context only — not investment advice.</footer>
+</main>
+</body>
+</html>

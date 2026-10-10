@@ -66,6 +66,8 @@ class Toolkit:
         self._date = report_date
         self._now = now or datetime.now(NY_TZ)
         self._news: NewsResult | None = None
+        # Kept so the report can show exact prices from the data, not from the model's text.
+        self.snapshots: dict[str, prices.PriceSnapshot] = {}
         self._handlers: dict[str, Callable[..., Any]] = {
             "get_market_snapshot": self.get_market_snapshot,
             "get_news": self.get_news,
@@ -84,6 +86,7 @@ class Toolkit:
 
     def get_market_snapshot(self, symbols: list[str]) -> dict[str, Any]:
         results = prices.fetch_all(symbols, now=self._now)
+        self.snapshots.update({s: v for s, v in results.items() if not isinstance(v, str)})
         return {s: (v if isinstance(v, str) else v.model_dump()) for s, v in results.items()}
 
     def get_news(self, query: str) -> dict[str, Any]:

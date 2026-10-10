@@ -10,6 +10,8 @@ from premarket_agent.agent.runner import AgentError, run_agent
 from premarket_agent.agent.tools import Toolkit
 from premarket_agent.collectors import NY_TZ, make_http_client
 from premarket_agent.config import get_settings
+from premarket_agent.notify import send_notifications
+from premarket_agent.report.render import RenderedReport, write_report
 from premarket_agent.trading_calendar import is_trading_day
 
 
@@ -42,10 +44,11 @@ def main(argv: list[str] | None = None) -> int:
 
     client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
     with make_http_client() as http:
+        toolkit = Toolkit(http, report_date, now_et)
         try:
             result = run_agent(
                 client,
-                Toolkit(http, report_date, now_et),
+                toolkit,
                 model=settings.claude_model,
                 report_date=report_date,
                 now_et=now_et,
@@ -55,11 +58,20 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Run failed: {exc}", file=sys.stderr)
             return 1
 
-    print(result.report.model_dump_json(indent=2))
+        rendered = RenderedReport(
+            report=result.report,
+            report_date=report_date,
+            generated_at=datetime.now(NY_TZ),
+            model=result.model,
+            snapshots=list(toolkit.snapshots.values()),
+        )
+        out_dir = write_report(rendered, settings.reports_dir)
+        notified = send_notifications(settings, rendered, out_dir, http)
+
+    print(f"Report written to {out_dir}/ (notifications: {notified or 'none configured'})")
     print(
         f"model={result.model} turns={result.iterations} tools={result.tool_calls} "
-        f"usage={result.usage}",
-        file=sys.stderr,
+        f"usage={result.usage}"
     )
     return 0
 

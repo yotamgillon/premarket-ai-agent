@@ -1,0 +1,20 @@
+{
+  "tldr": "Futures firm ahead of CPI; NQ holding above prior-day high.",
+  "overnight_summary": "NQ +0.4% overnight on chip strength.",
+  "key_levels": [
+    {"instrument": "NQ", "level": 31266.5, "label": "Prior day high"},
+    {"instrument": "ES", "level": 7817.0, "label": "Prior day low"}
+  ],
+  "scheduled_events": [
+    {"time_et": "08:30", "event": "CPI m/m", "impact": "High", "note": "Forecast 0.3% vs 0.4% prior."}
+  ],
+  "top_news": [
+    {"title": "Chips rally <script>alert(1)</script>", "source": "CNBC", "why_it_matters": "NQ heavyweights."}
+  ],
+  "sentiment": "risk-on",
+  "sentiment_rationale": "VIX below 15, futures green.",
+  "bias": "bullish",
+  "bias_rationale": "Holding above overnight low.",
+  "risks": ["Hot CPI print"],
+  "data_gaps": []
+}
