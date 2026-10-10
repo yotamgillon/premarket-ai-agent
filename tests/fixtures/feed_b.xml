@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Feed B</title>
+    <item>
+      <title>Stocks Futures Rise Ahead of CPI Report</title>
+      <link>https://example.com/b1</link>
+      <description>Duplicate headline with different casing.</description>
+      <pubDate>Mon, 12 Oct 2026 11:45:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Fed's Waller says inflation progress is uneven</title>
+      <link>https://example.com/b2</link>
+      <description>Comments ahead of the CPI release.</description>
+      <pubDate>Mon, 12 Oct 2026 10:15:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Feed A</title>
+    <item>
+      <title>Stocks futures rise ahead of CPI report</title>
+      <link>https://example.com/a1</link>
+      <description><![CDATA[<p>Nasdaq futures gained 0.4% &amp; S&amp;P futures rose.</p>]]></description>
+      <pubDate>Mon, 12 Oct 2026 11:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Oil slips as OPEC+ weighs output</title>
+      <link>https://example.com/a2</link>
+      <description>Crude fell 1%.</description>
+      <pubDate>Mon, 12 Oct 2026 09:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Old story from last week</title>
+      <link>https://example.com/a3</link>
+      <description>Stale.</description>
+      <pubDate>Tue, 06 Oct 2026 09:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
