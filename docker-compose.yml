@@ -1,0 +1,73 @@
+# One command: `make up` (or `docker compose up -d --build`).
+# The agent is a one-shot job: it runs, writes a report, pushes metrics and exits.
+# Prometheus, Pushgateway and Grafana keep running so you can look at the results.
+
+services:
+  agent:
+    build: .
+    image: premarket-agent:latest
+    env_file: .env
+    environment:
+      PUSHGATEWAY_URL: http://pushgateway:9091
+      REPORTS_DIR: /app/reports
+    # Match the host user so reports written to the bind mount are owned by you.
+    user: "${APP_UID:-10001}:${APP_GID:-10001}"
+    volumes:
+      - ./reports:/app/reports
+    depends_on:
+      - pushgateway
+    restart: "no"
+
+  pushgateway:
+    image: prom/pushgateway:v1.11.1
+    command:
+      # Persist pushed metrics so a restart doesn't erase "last success" timestamps.
+      # /pushgateway is owned by the image's non-root user (nobody); mounting the volume
+      # there lets Docker copy that ownership, so no `user: root` is needed.
+      - --persistence.file=/pushgateway/metrics
+      - --persistence.interval=1m
+    volumes:
+      - pushgateway-data:/pushgateway
+    ports:
+      - "127.0.0.1:9091:9091"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=180d
+    volumes:
+      - ./deploy/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on:
+      - pushgateway
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      # Read-only anonymous access so the dashboard opens without a login locally.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/premarket.json
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  pushgateway-data:
+  prometheus-data:
+  grafana-data:

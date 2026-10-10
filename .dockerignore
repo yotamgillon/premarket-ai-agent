@@ -1,0 +1,14 @@
+# Keep the build context small and secrets out of image layers.
+.env
+.env.*
+.git
+.venv
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+reports
+tests
+deploy
+docs
+.github

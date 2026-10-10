@@ -1,0 +1,26 @@
+groups:
+  - name: premarket-agent
+    rules:
+      # One rule catches crashes, a broken cron, an expired API key and a dead host.
+      # 26h = one daily run + slack. (Fires over weekends too; see README "Future work".)
+      - alert: PremarketNoRecentSuccess
+        expr: time() - premarket_last_success_timestamp_seconds > 26 * 3600
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: No successful pre-market report in the last 26 hours
+
+      - alert: PremarketLastRunFailed
+        expr: premarket_run_success == 0
+        labels:
+          severity: warning
+        annotations:
+          summary: The most recent pre-market run failed
+
+      - alert: PremarketRunCostHigh
+        expr: premarket_run_cost_usd > 0.25
+        labels:
+          severity: info
+        annotations:
+          summary: "Last run cost {{ $value | printf \"$%.3f\" }} (expected ~$0.03-0.06)"
