@@ -17,7 +17,7 @@ def summary_text(rendered: RenderedReport) -> str:
         f"<b>Pre-Market — {rendered.report_date:%a %b %d}</b>",
         escape(r.tldr),
         "",
-        f"<b>Bias:</b> {r.bias} · <b>Sentiment:</b> {r.sentiment}",
+        f"<b>Bias:</b> {r.bias_label} · <b>Sentiment:</b> {r.sentiment}",
     ]
     for s in rendered.snapshots:
         lines.append(f"<code>{escape(s.symbol):6}</code> {s.last:,.2f} ({s.change_pct:+.2f}%)")

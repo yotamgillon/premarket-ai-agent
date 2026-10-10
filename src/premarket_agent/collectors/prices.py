@@ -22,6 +22,7 @@ class PriceSnapshot(BaseModel):
     symbol: str
     name: str
     as_of: datetime
+    last_bar_time: datetime  # when the `last` price printed — tells you which session it reflects
     last: float
     prev_close: float
     change: float
@@ -68,6 +69,7 @@ def build_snapshot(
         symbol=symbol,
         name=INSTRUMENTS.get(symbol, symbol),
         as_of=now,
+        last_bar_time=pd.Timestamp(latest.index[-1]).tz_convert(NY_TZ).to_pydatetime(),
         last=round(last, 2),
         prev_close=round(prev_close, 2),
         change=round(change, 2),

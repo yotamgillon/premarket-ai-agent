@@ -2,9 +2,13 @@
 
 > {{ r.tldr }}
 
-**Bias:** {{ r.bias | upper }} · **Sentiment:** {{ r.sentiment }}
+**Bias:** {{ r.bias_label }} · **Sentiment:** {{ r.sentiment }}
 
 ## Market snapshot
+{% if session_note %}
+_Prices as of {{ session_note }}._
+
+{% endif %}
 {% if snapshots %}
 | Instrument | Last | Change | Prior H / L | Overnight H / L | 5-day H / L |
 |---|---:|---:|---:|---:|---:|
@@ -18,9 +22,14 @@ _Price data unavailable._
 {{ r.overnight_summary }}
 
 ## Key levels
-| Instrument | Level | Note |
-|---|---:|---|
-{% for k in r.key_levels %}| {{ k.instrument }} | {{ num(k.level) }} | {{ k.label }} |
+{% for ladder in ladders %}
+**{{ ladder.instrument }}** (high → low)
+
+| Level | Note |
+|---:|---|
+{% for rung in ladder.rungs | reverse %}| {{ "**" ~ num(rung.price) ~ "**" if rung.is_current else num(rung.price) }} | {{ "◀ **Last**" if rung.is_current else rung.label }} |
+{% endfor %}
+
 {% endfor %}
 
 ## Scheduled events (ET)
@@ -41,7 +50,7 @@ _No medium/high-impact US events scheduled._
 ## Sentiment: {{ r.sentiment }}
 {{ r.sentiment_rationale }}
 
-## Bias: {{ r.bias }}
+## Bias: {{ r.bias_label }}
 {{ r.bias_rationale }}
 
 ## Risks

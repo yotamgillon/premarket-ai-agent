@@ -3,141 +3,368 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
 <title>Pre-Market Report {{ report_date.isoformat() }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* ---------- tokens: dark first ---------- */
   :root {
-    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e3e3e0;
-    --up: #127a3e; --down: #b3261e; --flat: #6b6b70; --accent: #2a5bd7;
+    --bg: #05070b;
+    --bg-glow-1: rgba(0, 229, 255, .10);
+    --bg-glow-2: rgba(255, 46, 136, .07);
+    --grid: rgba(0, 229, 255, .045);
+    --panel: rgba(13, 18, 27, .62);
+    --panel-solid: #0d121b;
+    --border: rgba(0, 229, 255, .16);
+    --text: #e7f0fb;
+    --muted: #7c8aa0;
+    --faint: rgba(124, 138, 160, .25);
+    --cyan: #00e5ff;
+    --up: #00ff9c;
+    --down: #ff2e88;
+    --amber: #ffc94a;
+    --glow-strength: 1;
+    --mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: light) {
     :root {
-      --bg: #141416; --card: #1d1d20; --text: #ececee; --muted: #9a9aa2; --border: #2e2e33;
-      --up: #4cc27a; --down: #f0716a; --flat: #9a9aa2; --accent: #8aa9ff;
+      --bg: #eef2f7;
+      --bg-glow-1: rgba(0, 150, 190, .10);
+      --bg-glow-2: rgba(200, 30, 110, .06);
+      --grid: rgba(10, 40, 80, .05);
+      --panel: rgba(255, 255, 255, .72);
+      --panel-solid: #ffffff;
+      --border: rgba(0, 120, 160, .22);
+      --text: #0b1422;
+      --muted: #56657a;
+      --faint: rgba(86, 101, 122, .22);
+      --cyan: #0086a8;
+      --up: #00875a;
+      --down: #c4165f;
+      --amber: #a86b00;
+      --glow-strength: .35;
     }
   }
+
+  /* ---------- base ---------- */
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
-  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
-  header h1 { font-size: 22px; margin: 0 0 4px; }
-  header .date { color: var(--muted); margin: 0 0 16px; }
-  .tldr { font-size: 17px; padding: 14px 16px; background: var(--card);
-          border-left: 4px solid var(--accent); border-radius: 6px; margin: 0 0 12px; }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-  .chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border);
-          background: var(--card); font-size: 13px; font-weight: 600; text-transform: uppercase; }
-  .bullish, .risk-on { color: var(--up); } .bearish, .risk-off { color: var(--down); }
-  .neutral, .mixed { color: var(--flat); }
-  section { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-            padding: 14px 16px; margin-bottom: 14px; }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
-       margin: 0 0 10px; }
-  .table-wrap { overflow-x: auto; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--text); background-color: var(--bg);
+    font: 15px/1.55 var(--sans);
+    background-image:
+      radial-gradient(1200px 600px at 10% -10%, var(--bg-glow-1), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, var(--bg-glow-2), transparent 60%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+  /* film-grain noise, generated inline (no external asset) */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  main { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 20px 16px 56px; }
+  .mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--cyan); }
+
+  /* ---------- load animation ---------- */
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  .reveal { animation: rise .55s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+  @media (prefers-reduced-motion: reduce) { .reveal, .dot { animation: none; } }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border);
+  }
+  .brand { color: var(--cyan); text-shadow: 0 0 calc(12px * var(--glow-strength)) var(--cyan); }
+  .session { display: inline-flex; align-items: center; gap: 8px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
+         box-shadow: 0 0 10px var(--cyan); animation: pulse 2.4s ease-in-out infinite; }
+
+  h1 { font: 700 26px/1.2 var(--sans); margin: 0 0 4px; letter-spacing: -.01em; }
+  .date { color: var(--muted); margin: 0 0 18px; font-family: var(--mono); font-size: 13px; }
+
+  /* ---------- glass panels ---------- */
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 14px;
+    -webkit-backdrop-filter: blur(12px) saturate(140%); backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .02) inset,
+                0 0 calc(24px * var(--glow-strength)) rgba(0, 229, 255, calc(.06 * var(--glow-strength)));
+  }
+  h2 {
+    display: flex; align-items: center; gap: 10px; margin: 0 0 12px;
+    font: 600 11px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+  }
+  h2::before { content: ""; width: 14px; height: 2px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  p { margin: 0; }
+
+  /* ---------- hero: TL;DR + badges ---------- */
+  .hero { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  .tldr { font-size: 18px; line-height: 1.5; font-weight: 500; }
+  .badges { display: flex; gap: 12px; }
+  .badge {
+    --c: var(--cyan);
+    min-width: 150px; padding: 12px 16px; border-radius: 12px; text-align: center;
+    border: 1px solid var(--c); color: var(--c);
+    background: color-mix(in srgb, var(--c) 8%, transparent);
+    box-shadow: 0 0 calc(22px * var(--glow-strength)) color-mix(in srgb, var(--c) 35%, transparent),
+                inset 0 0 calc(18px * var(--glow-strength)) color-mix(in srgb, var(--c) 18%, transparent);
+  }
+  .badge.up { --c: var(--up); } .badge.down { --c: var(--down); } .badge.flat { --c: var(--cyan); }
+  .badge .k { display: block; font: 600 10px/1 var(--mono); letter-spacing: .18em; color: var(--muted); margin-bottom: 8px; }
+  .badge .v { display: block; font: 700 24px/1 var(--mono); letter-spacing: .04em; white-space: nowrap;
+              text-shadow: 0 0 calc(14px * var(--glow-strength)) var(--c); }
+
+  /* ---------- price table ---------- */
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left;
-           white-space: nowrap; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  td.wrap { white-space: normal; }
+  th { font: 600 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+       text-align: left; padding: 0 10px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 10px; border-bottom: 1px solid var(--faint); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
-  .up { color: var(--up); } .down { color: var(--down); }
-  ul { margin: 0; padding-left: 20px; } li { margin: 4px 0; }
-  .src { color: var(--muted); font-size: 13px; }
-  .gaps { border-color: var(--down); }
-  footer { color: var(--muted); font-size: 12px; margin-top: 20px; }
+  th.r, td.r { text-align: right; }
+  .sym { font: 700 14px/1.2 var(--mono); }
+  .sym small { display: block; font: 400 11px/1.3 var(--sans); color: var(--muted); }
+  .last { font: 700 16px/1 var(--mono); }
+  .chg { font: 500 13px/1.3 var(--mono); white-space: nowrap; }
+  .chg .arrow { font-size: 10px; margin-right: 4px; }
+
+  .range { min-width: 170px; }
+  .track { position: relative; height: 6px; border-radius: 99px; margin: 8px 0 6px;
+           background: linear-gradient(90deg, color-mix(in srgb, var(--down) 55%, transparent), color-mix(in srgb, var(--cyan) 35%, transparent), color-mix(in srgb, var(--up) 55%, transparent)); }
+  .marker { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%;
+            transform: translate(-50%, -50%); background: var(--panel-solid); border: 2px solid var(--cyan);
+            box-shadow: 0 0 10px var(--cyan); }
+  .range-labels { display: flex; justify-content: space-between; font: 400 11px/1 var(--mono); color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; margin: 0 -4px; }
+
+  /* ---------- level ladders ---------- */
+  .ladders { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .ladder h3 { margin: 0 0 6px; font: 700 13px/1 var(--mono); letter-spacing: .1em; }
+  .ladder h3 span { color: var(--muted); font-weight: 400; }
+  .rail { position: relative; height: 46px; margin: 4px 8px 10px; }
+  .rail::before { content: ""; position: absolute; left: 0; right: 0; top: 30px; height: 2px;
+                  background: linear-gradient(90deg, var(--up), var(--faint) 50%, var(--down)); opacity: .6; }
+  .tick { position: absolute; top: 26px; width: 2px; height: 10px; transform: translateX(-50%); background: var(--muted); }
+  .tick.up { background: var(--down); } .tick.down { background: var(--up); }
+  .tick.now { top: 21px; width: 12px; height: 20px; border-radius: 3px; background: var(--cyan);
+              box-shadow: 0 0 14px var(--cyan); }
+  .tick.now::after { content: attr(data-price); position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+                     font: 700 11px/1 var(--mono); color: var(--cyan); white-space: nowrap;
+                     text-shadow: 0 0 8px var(--cyan); }
+  .rungs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rung { display: inline-flex; flex-direction: column; gap: 2px; padding: 6px 9px; border-radius: 8px;
+          border: 1px solid var(--faint); background: color-mix(in srgb, var(--panel-solid) 60%, transparent); }
+  .rung .p { font: 600 12px/1 var(--mono); }
+  .rung .l { font-size: 11px; line-height: 1.2; color: var(--muted); }
+  .rung.down { border-color: color-mix(in srgb, var(--up) 45%, transparent); }
+  .rung.down .p { color: var(--up); }
+  .rung.up { border-color: color-mix(in srgb, var(--down) 45%, transparent); }
+  .rung.up .p { color: var(--down); }
+  .rung.now { border-color: var(--cyan); box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 40%, transparent); }
+  .rung.now .p { color: var(--cyan); }
+  .legend { margin-top: 10px; font: 400 11px/1.4 var(--mono); color: var(--muted); }
+
+  /* ---------- events / news / lists ---------- */
+  .events { list-style: none; margin: 0; padding: 0; }
+  .events li { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: baseline;
+               padding: 10px 0; border-bottom: 1px solid var(--faint); }
+  .events li:last-child { border-bottom: none; }
+  .events time { font: 700 14px/1 var(--mono); color: var(--cyan); }
+  .events .note { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .impact { font: 600 10px/1 var(--mono); letter-spacing: .12em; padding: 4px 7px; border-radius: 6px;
+            border: 1px solid currentColor; text-transform: uppercase; }
+  .impact.High { color: var(--down); } .impact.Medium { color: var(--amber); }
+
+  .news { list-style: none; margin: 0; padding: 0; }
+  .news li { padding: 10px 0; border-bottom: 1px solid var(--faint); }
+  .news li:last-child { border-bottom: none; }
+  .news strong { font-weight: 600; }
+  .news .src { font: 500 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--cyan);
+               margin-left: 6px; white-space: nowrap; }
+  .news p { color: var(--muted); font-size: 14px; margin-top: 3px; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .call { border-left: 3px solid var(--cyan); }
+  .call.call-up { border-left-color: var(--up); } .call.call-down { border-left-color: var(--down); }
+  .call h2 .tag { margin-left: auto; font-weight: 700; letter-spacing: .08em; }
+
+  .bullets { list-style: none; margin: 0; padding: 0; }
+  .bullets li { position: relative; padding: 4px 0 4px 20px; }
+  .bullets li::before { content: "›"; position: absolute; left: 4px; color: var(--cyan); font-family: var(--mono); font-weight: 700; }
+  .gaps { border-color: color-mix(in srgb, var(--down) 50%, transparent); }
+  .gaps .bullets li::before { color: var(--down); }
+
+  .empty { color: var(--muted); font-style: italic; }
+  footer { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border);
+           font: 400 11px/1.6 var(--mono); color: var(--muted); letter-spacing: .04em; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; }
+    .badges { width: 100%; }
+    .badge { flex: 1; min-width: 0; }
+    .badge .v { font-size: 20px; }
+    .split { grid-template-columns: 1fr; }
+    /* price table becomes stacked cards */
+    table.prices thead { display: none; }
+    table.prices, table.prices tbody, table.prices tr, table.prices td { display: block; width: 100%; }
+    table.prices tr { padding: 12px 0; border-bottom: 1px solid var(--faint); }
+    table.prices tr:last-child { border-bottom: none; }
+    table.prices td { border: none; padding: 4px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: right; }
+    table.prices td::before { content: attr(data-label); font: 600 10px/1 var(--mono); letter-spacing: .14em;
+                              text-transform: uppercase; color: var(--muted); text-align: left; }
+    table.prices td.range { display: block; }
+    table.prices td.range::before { display: block; margin-bottom: 4px; }
+    .events li { grid-template-columns: 54px 1fr; }
+    .events .impact { grid-column: 2; justify-self: start; }
+  }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <h1>Pre-Market Report</h1>
-    <p class="date">{{ report_date.strftime('%A, %B %d, %Y') }} · NQ / ES futures</p>
-  </header>
-
-  <p class="tldr">{{ r.tldr }}</p>
-  <div class="chips">
-    <span class="chip {{ r.bias }}">Bias: {{ r.bias }}</span>
-    <span class="chip {{ r.sentiment }}">Sentiment: {{ r.sentiment }}</span>
+  <div class="topbar reveal" style="--i: 0">
+    <span class="brand">Premarket // Terminal</span>
+    {% if session_note %}
+    <span class="session"><span class="dot"></span>Prices as of {{ session_note }}</span>
+    {% endif %}
   </div>
 
-  <section>
-    <h2>Market snapshot</h2>
-    {% if snapshots %}
-    <div class="table-wrap"><table>
-      <tr><th>Instrument</th><th class="num">Last</th><th class="num">Change</th>
-          <th class="num">Prior H / L</th><th class="num">Overnight H / L</th><th class="num">5-day H / L</th></tr>
-      {% for s in snapshots %}
-      <tr>
-        <td>{{ s.symbol }}</td>
-        <td class="num">{{ num(s.last) }}</td>
-        <td class="num {{ 'up' if s.change > 0 else 'down' if s.change < 0 else '' }}">{{ signed(s.change) }} ({{ signed(s.change_pct) }}%)</td>
-        <td class="num">{{ num(s.prior_high) }} / {{ num(s.prior_low) }}</td>
-        <td class="num">{{ num(s.overnight_high) }} / {{ num(s.overnight_low) }}</td>
-        <td class="num">{{ num(s.week_high) }} / {{ num(s.week_low) }}</td>
-      </tr>
-      {% endfor %}
-    </table></div>
-    {% else %}<p>Price data unavailable.</p>{% endif %}
+  <header class="reveal" style="--i: 1">
+    <h1>Pre-Market Report</h1>
+    <p class="date">{{ report_date.strftime('%a %d %b %Y').upper() }} · NQ · ES · VIX</p>
+  </header>
+
+  <section class="panel hero reveal" style="--i: 2">
+    <p class="tldr">{{ r.tldr }}</p>
+    <div class="badges">
+      <div class="badge {{ bias_direction[r.bias] }}">
+        <span class="k">BIAS</span>
+        <span class="v">{{ r.bias_label }}</span>
+      </div>
+      <div class="badge {{ sentiment_direction[r.sentiment] }}">
+        <span class="k">SENTIMENT</span>
+        <span class="v">{{ r.sentiment | upper }}</span>
+      </div>
+    </div>
   </section>
 
-  <section>
+  <section class="panel reveal" style="--i: 3">
+    <h2>Market snapshot</h2>
+    {% if snapshots %}
+    <div class="table-wrap">
+      <table class="prices">
+        <thead>
+          <tr><th>Instrument</th><th class="r">Last</th><th class="r">Change</th>
+              <th>Prior session range</th><th class="r">Overnight H / L</th><th class="r">5-day H / L</th></tr>
+        </thead>
+        <tbody>
+        {% for s in snapshots %}
+          {% set d = direction(s.change) %}
+          <tr>
+            <td data-label="Instrument"><span class="sym">{{ s.symbol }}<small>{{ s.name }}</small></span></td>
+            <td data-label="Last" class="r"><span class="last num">{{ num(s.last) }}</span></td>
+            <td data-label="Change" class="r"><span class="chg {{ d }}"><span class="arrow">{{ "▲" if d == "up" else "▼" if d == "down" else "■" }}</span>{{ signed(s.change) }} ({{ signed(s.change_pct) }}%)</span></td>
+            <td data-label="Prior range" class="range">
+              <div class="track"><span class="marker" style="left: {{ range_position(s.last, s.prior_low, s.prior_high) }}%"></span></div>
+              <div class="range-labels"><span>{{ num(s.prior_low) }}</span><span>{{ num(s.prior_high) }}</span></div>
+            </td>
+            <td data-label="Overnight H / L" class="r num">{{ num(s.overnight_high) }} / {{ num(s.overnight_low) }}</td>
+            <td data-label="5-day H / L" class="r num">{{ num(s.week_high) }} / {{ num(s.week_low) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty">Price data unavailable.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel reveal" style="--i: 4">
     <h2>Overnight summary</h2>
     <p>{{ r.overnight_summary }}</p>
   </section>
 
-  <section>
+  {% if ladders %}
+  <section class="panel reveal" style="--i: 5">
     <h2>Key levels</h2>
-    <div class="table-wrap"><table>
-      <tr><th>Instrument</th><th class="num">Level</th><th>Note</th></tr>
-      {% for k in r.key_levels %}
-      <tr><td>{{ k.instrument }}</td><td class="num">{{ num(k.level) }}</td><td class="wrap">{{ k.label }}</td></tr>
+    <div class="ladders">
+      {% for ladder in ladders %}
+      <div class="ladder">
+        <h3>{{ ladder.instrument }} <span>{{ num(ladder.rungs[0].price) }} → {{ num(ladder.rungs[-1].price) }}</span></h3>
+        <div class="rail">
+          {% for rung in ladder.rungs %}
+          <span class="tick {{ 'now' if rung.is_current else rung.side }}" style="left: {{ rung.position }}%"{% if rung.is_current %} data-price="{{ num(rung.price) }}"{% endif %} title="{{ num(rung.price) }} {{ rung.label }}"></span>
+          {% endfor %}
+        </div>
+        <div class="rungs">
+          {% for rung in ladder.rungs %}
+          <span class="rung {{ 'now' if rung.is_current else rung.side }}"><span class="p">{{ num(rung.price) }}</span><span class="l">{{ rung.label }}</span></span>
+          {% endfor %}
+        </div>
+      </div>
       {% endfor %}
-    </table></div>
+    </div>
+    <p class="legend">Low → high · <span class="up">support</span> below last · <span class="down">resistance</span> above · <span class="flat">■ last</span></p>
   </section>
+  {% endif %}
 
-  <section>
-    <h2>Scheduled events (ET)</h2>
+  <section class="panel reveal" style="--i: 6">
+    <h2>Scheduled events · ET</h2>
     {% if r.scheduled_events %}
-    <div class="table-wrap"><table>
-      <tr><th>Time</th><th>Event</th><th>Impact</th><th>Note</th></tr>
+    <ul class="events">
       {% for e in r.scheduled_events %}
-      <tr><td>{{ e.time_et }}</td><td>{{ e.event }}</td><td>{{ e.impact }}</td><td class="wrap">{{ e.note }}</td></tr>
+      <li><time>{{ e.time_et }}</time><div>{{ e.event }}<span class="note">{{ e.note }}</span></div><span class="impact {{ e.impact }}">{{ e.impact }}</span></li>
       {% endfor %}
-    </table></div>
-    {% else %}<p>No medium/high-impact US events scheduled.</p>{% endif %}
+    </ul>
+    {% else %}
+    <p class="empty">No medium/high-impact US events scheduled.</p>
+    {% endif %}
   </section>
 
-  <section>
+  <section class="panel reveal" style="--i: 7">
     <h2>Top news</h2>
-    <ul>
+    <ul class="news">
       {% for h in r.top_news %}
-      <li><strong>{{ h.title }}</strong> <span class="src">({{ h.source }})</span><br>{{ h.why_it_matters }}</li>
+      <li><strong>{{ h.title }}</strong><span class="src">{{ h.source }}</span><p>{{ h.why_it_matters }}</p></li>
       {% endfor %}
     </ul>
   </section>
 
-  <section>
-    <h2>Sentiment — <span class="{{ r.sentiment }}">{{ r.sentiment }}</span></h2>
-    <p>{{ r.sentiment_rationale }}</p>
-  </section>
+  <div class="split">
+    <section class="panel call call-{{ sentiment_direction[r.sentiment] }} reveal" style="--i: 8">
+      <h2>Sentiment <span class="tag {{ sentiment_direction[r.sentiment] }}">{{ r.sentiment | upper }}</span></h2>
+      <p>{{ r.sentiment_rationale }}</p>
+    </section>
+    <section class="panel call call-{{ bias_direction[r.bias] }} reveal" style="--i: 9">
+      <h2>Bias <span class="tag {{ bias_direction[r.bias] }}">{{ r.bias_label }}</span></h2>
+      <p>{{ r.bias_rationale }}</p>
+    </section>
+  </div>
 
-  <section>
-    <h2>Bias — <span class="{{ r.bias }}">{{ r.bias }}</span></h2>
-    <p>{{ r.bias_rationale }}</p>
-  </section>
-
-  <section>
+  <section class="panel reveal" style="--i: 10">
     <h2>Risks</h2>
-    <ul>{% for risk in r.risks %}<li>{{ risk }}</li>{% endfor %}</ul>
+    <ul class="bullets">{% for risk in r.risks %}<li>{{ risk }}</li>{% endfor %}</ul>
   </section>
 
   {% if r.data_gaps %}
-  <section class="gaps">
+  <section class="panel gaps reveal" style="--i: 11">
     <h2>Data gaps</h2>
-    <ul>{% for gap in r.data_gaps %}<li>{{ gap }}</li>{% endfor %}</ul>
+    <ul class="bullets">{% for gap in r.data_gaps %}<li>{{ gap }}</li>{% endfor %}</ul>
   </section>
   {% endif %}
 
-  <footer>Generated {{ generated_at.strftime('%Y-%m-%d %H:%M %Z') }} by {{ model }}. Research context only — not investment advice.</footer>
+  <footer>Generated {{ generated_at.strftime('%Y-%m-%d %H:%M %Z') }} · {{ model }} · Research context only — not investment advice.</footer>
 </main>
 </body>
 </html>

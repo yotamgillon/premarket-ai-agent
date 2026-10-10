@@ -9,7 +9,7 @@ from premarket_agent.report.render import RenderedReport
 def build_message(rendered: RenderedReport, sender: str, to: str) -> EmailMessage:
     msg = EmailMessage()
     msg["Subject"] = (
-        f"Pre-Market {rendered.report_date:%a %b %d}: {rendered.report.bias.upper()} — "
+        f"Pre-Market {rendered.report_date:%a %b %d}: {rendered.report.bias_label} — "
         f"{rendered.report.tldr[:80]}"
     )
     msg["From"] = sender

@@ -54,6 +54,7 @@ def test_build_snapshot_monday_includes_weekend_reopen() -> None:
     assert snap.overnight_low == 107.5  # Sunday bar counted, Friday 15:45 bar excluded
     assert snap.week_high == 112.0
     assert snap.week_low == 95.0
+    assert snap.last_bar_time == datetime(2026, 10, 12, 7, 45, tzinfo=NY_TZ)
 
 
 def test_build_snapshot_no_overnight_bars() -> None:
