@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# A newer push to the same branch cancels the older, still-running pipeline.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege: the workflow can read the repo and nothing else.
+permissions:
+  contents: read
+
+jobs:
+  lint-test:
+    name: Lint & test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.0"
+          enable-cache: true
+
+      - name: Install Python 3.12 and locked dependencies
+        run: uv sync --locked
+
+      - name: Ruff lint
+        run: uv run ruff check --output-format=github .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Pytest
+        # No secrets needed: every external API (Claude, yfinance, RSS, Telegram, SMTP) is mocked.
+        run: uv run pytest --cov=premarket_agent --cov-report=term-missing:skip-covered
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # scan the full history, not just the latest commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker:
+    name: Docker build
+    runs-on: ubuntu-24.04
+    needs: lint-test
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: premarket-agent:ci
+          # Reuse layers between CI runs via the GitHub Actions cache.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test the image
+        run: |
+          docker run --rm premarket-agent:ci --help
+          docker run --rm --entrypoint id premarket-agent:ci | grep -q 'uid=10001' && echo "runs as non-root"
+
+      - name: Validate docker-compose.yml
+        run: |
+          touch .env
+          docker compose config --quiet
