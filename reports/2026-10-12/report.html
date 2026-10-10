@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Pre-Market Report 2026-10-12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- tokens: dark first ---------- */
+  :root {
+    --bg: #05070b;
+    --bg-glow-1: rgba(0, 229, 255, .10);
+    --bg-glow-2: rgba(255, 46, 136, .07);
+    --grid: rgba(0, 229, 255, .045);
+    --panel: rgba(13, 18, 27, .62);
+    --panel-solid: #0d121b;
+    --border: rgba(0, 229, 255, .16);
+    --text: #e7f0fb;
+    --muted: #7c8aa0;
+    --faint: rgba(124, 138, 160, .25);
+    --cyan: #00e5ff;
+    --up: #00ff9c;
+    --down: #ff2e88;
+    --amber: #ffc94a;
+    --glow-strength: 1;
+    --mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #eef2f7;
+      --bg-glow-1: rgba(0, 150, 190, .10);
+      --bg-glow-2: rgba(200, 30, 110, .06);
+      --grid: rgba(10, 40, 80, .05);
+      --panel: rgba(255, 255, 255, .72);
+      --panel-solid: #ffffff;
+      --border: rgba(0, 120, 160, .22);
+      --text: #0b1422;
+      --muted: #56657a;
+      --faint: rgba(86, 101, 122, .22);
+      --cyan: #0086a8;
+      --up: #00875a;
+      --down: #c4165f;
+      --amber: #a86b00;
+      --glow-strength: .35;
+    }
+  }
+
+  /* ---------- base ---------- */
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--text); background-color: var(--bg);
+    font: 15px/1.55 var(--sans);
+    background-image:
+      radial-gradient(1200px 600px at 10% -10%, var(--bg-glow-1), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, var(--bg-glow-2), transparent 60%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+  /* film-grain noise, generated inline (no external asset) */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  main { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 20px 16px 56px; }
+  .mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--cyan); }
+
+  /* ---------- load animation ---------- */
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  .reveal { animation: rise .55s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+  @media (prefers-reduced-motion: reduce) { .reveal, .dot { animation: none; } }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border);
+  }
+  .brand { color: var(--cyan); text-shadow: 0 0 calc(12px * var(--glow-strength)) var(--cyan); }
+  .session { display: inline-flex; align-items: center; gap: 8px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
+         box-shadow: 0 0 10px var(--cyan); animation: pulse 2.4s ease-in-out infinite; }
+
+  h1 { font: 700 26px/1.2 var(--sans); margin: 0 0 4px; letter-spacing: -.01em; }
+  .date { color: var(--muted); margin: 0 0 18px; font-family: var(--mono); font-size: 13px; }
+
+  /* ---------- glass panels ---------- */
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 14px;
+    -webkit-backdrop-filter: blur(12px) saturate(140%); backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .02) inset,
+                0 0 calc(24px * var(--glow-strength)) rgba(0, 229, 255, calc(.06 * var(--glow-strength)));
+  }
+  h2 {
+    display: flex; align-items: center; gap: 10px; margin: 0 0 12px;
+    font: 600 11px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+  }
+  h2::before { content: ""; width: 14px; height: 2px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  p { margin: 0; }
+
+  /* ---------- hero: TL;DR + badges ---------- */
+  .hero { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  .tldr { font-size: 18px; line-height: 1.5; font-weight: 500; }
+  .badges { display: flex; gap: 12px; }
+  .badge {
+    --c: var(--cyan);
+    min-width: 150px; padding: 12px 16px; border-radius: 12px; text-align: center;
+    border: 1px solid var(--c); color: var(--c);
+    background: color-mix(in srgb, var(--c) 8%, transparent);
+    box-shadow: 0 0 calc(22px * var(--glow-strength)) color-mix(in srgb, var(--c) 35%, transparent),
+                inset 0 0 calc(18px * var(--glow-strength)) color-mix(in srgb, var(--c) 18%, transparent);
+  }
+  .badge.up { --c: var(--up); } .badge.down { --c: var(--down); } .badge.flat { --c: var(--cyan); }
+  .badge .k { display: block; font: 600 10px/1 var(--mono); letter-spacing: .18em; color: var(--muted); margin-bottom: 8px; }
+  .badge .v { display: block; font: 700 24px/1 var(--mono); letter-spacing: .04em; white-space: nowrap;
+              text-shadow: 0 0 calc(14px * var(--glow-strength)) var(--c); }
+
+  /* ---------- price table ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { font: 600 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+       text-align: left; padding: 0 10px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 10px; border-bottom: 1px solid var(--faint); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  th.r, td.r { text-align: right; }
+  .sym { font: 700 14px/1.2 var(--mono); }
+  .sym small { display: block; font: 400 11px/1.3 var(--sans); color: var(--muted); }
+  .last { font: 700 16px/1 var(--mono); }
+  .chg { font: 500 13px/1.3 var(--mono); white-space: nowrap; }
+  .chg .arrow { font-size: 10px; margin-right: 4px; }
+
+  .range { min-width: 170px; }
+  .track { position: relative; height: 6px; border-radius: 99px; margin: 8px 0 6px;
+           background: linear-gradient(90deg, color-mix(in srgb, var(--down) 55%, transparent), color-mix(in srgb, var(--cyan) 35%, transparent), color-mix(in srgb, var(--up) 55%, transparent)); }
+  .marker { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%;
+            transform: translate(-50%, -50%); background: var(--panel-solid); border: 2px solid var(--cyan);
+            box-shadow: 0 0 10px var(--cyan); }
+  .range-labels { display: flex; justify-content: space-between; font: 400 11px/1 var(--mono); color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; margin: 0 -4px; }
+
+  /* ---------- level ladders ---------- */
+  .ladders { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .ladder h3 { margin: 0 0 6px; font: 700 13px/1 var(--mono); letter-spacing: .1em; }
+  .ladder h3 span { color: var(--muted); font-weight: 400; }
+  .rail { position: relative; height: 46px; margin: 4px 8px 10px; }
+  .rail::before { content: ""; position: absolute; left: 0; right: 0; top: 30px; height: 2px;
+                  background: linear-gradient(90deg, var(--up), var(--faint) 50%, var(--down)); opacity: .6; }
+  .tick { position: absolute; top: 26px; width: 2px; height: 10px; transform: translateX(-50%); background: var(--muted); }
+  .tick.up { background: var(--down); } .tick.down { background: var(--up); }
+  .tick.now { top: 21px; width: 12px; height: 20px; border-radius: 3px; background: var(--cyan);
+              box-shadow: 0 0 14px var(--cyan); }
+  .tick.now::after { content: attr(data-price); position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+                     font: 700 11px/1 var(--mono); color: var(--cyan); white-space: nowrap;
+                     text-shadow: 0 0 8px var(--cyan); }
+  .rungs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rung { display: inline-flex; flex-direction: column; gap: 2px; padding: 6px 9px; border-radius: 8px;
+          border: 1px solid var(--faint); background: color-mix(in srgb, var(--panel-solid) 60%, transparent); }
+  .rung .p { font: 600 12px/1 var(--mono); }
+  .rung .l { font-size: 11px; line-height: 1.2; color: var(--muted); }
+  .rung.down { border-color: color-mix(in srgb, var(--up) 45%, transparent); }
+  .rung.down .p { color: var(--up); }
+  .rung.up { border-color: color-mix(in srgb, var(--down) 45%, transparent); }
+  .rung.up .p { color: var(--down); }
+  .rung.now { border-color: var(--cyan); box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 40%, transparent); }
+  .rung.now .p { color: var(--cyan); }
+  .legend { margin-top: 10px; font: 400 11px/1.4 var(--mono); color: var(--muted); }
+
+  /* ---------- events / news / lists ---------- */
+  .events { list-style: none; margin: 0; padding: 0; }
+  .events li { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: baseline;
+               padding: 10px 0; border-bottom: 1px solid var(--faint); }
+  .events li:last-child { border-bottom: none; }
+  .events time { font: 700 14px/1 var(--mono); color: var(--cyan); }
+  .events .note { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .impact { font: 600 10px/1 var(--mono); letter-spacing: .12em; padding: 4px 7px; border-radius: 6px;
+            border: 1px solid currentColor; text-transform: uppercase; }
+  .impact.High { color: var(--down); } .impact.Medium { color: var(--amber); }
+
+  .news { list-style: none; margin: 0; padding: 0; }
+  .news li { padding: 10px 0; border-bottom: 1px solid var(--faint); }
+  .news li:last-child { border-bottom: none; }
+  .news strong { font-weight: 600; }
+  .news .src { font: 500 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--cyan);
+               margin-left: 6px; white-space: nowrap; }
+  .news p { color: var(--muted); font-size: 14px; margin-top: 3px; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .call { border-left: 3px solid var(--cyan); }
+  .call.call-up { border-left-color: var(--up); } .call.call-down { border-left-color: var(--down); }
+  .call h2 .tag { margin-left: auto; font-weight: 700; letter-spacing: .08em; }
+
+  .bullets { list-style: none; margin: 0; padding: 0; }
+  .bullets li { position: relative; padding: 4px 0 4px 20px; }
+  .bullets li::before { content: "›"; position: absolute; left: 4px; color: var(--cyan); font-family: var(--mono); font-weight: 700; }
+  .gaps { border-color: color-mix(in srgb, var(--down) 50%, transparent); }
+  .gaps .bullets li::before { color: var(--down); }
+
+  .empty { color: var(--muted); font-style: italic; }
+  footer { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border);
+           font: 400 11px/1.6 var(--mono); color: var(--muted); letter-spacing: .04em; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; }
+    .badges { width: 100%; }
+    .badge { flex: 1; min-width: 0; }
+    .badge .v { font-size: 20px; }
+    .split { grid-template-columns: 1fr; }
+    /* price table becomes stacked cards */
+    table.prices thead { display: none; }
+    table.prices, table.prices tbody, table.prices tr, table.prices td { display: block; width: 100%; }
+    table.prices tr { padding: 12px 0; border-bottom: 1px solid var(--faint); }
+    table.prices tr:last-child { border-bottom: none; }
+    table.prices td { border: none; padding: 4px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: right; }
+    table.prices td::before { content: attr(data-label); font: 600 10px/1 var(--mono); letter-spacing: .14em;
+                              text-transform: uppercase; color: var(--muted); text-align: left; }
+    table.prices td.range { display: block; }
+    table.prices td.range::before { display: block; margin-bottom: 4px; }
+    .events li { grid-template-columns: 54px 1fr; }
+    .events .impact { grid-column: 2; justify-self: start; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar reveal" style="--i: 0">
+    <span class="brand">Premarket // Terminal</span>
+    <span class="session"><span class="dot"></span>Prices as of Fri Oct 09, 16:45 ET</span>
+  </div>
+
+  <header class="reveal" style="--i: 1">
+    <h1>Pre-Market Report</h1>
+    <p class="date">MON 12 OCT 2026 · NQ · ES · VIX</p>
+  </header>
+
+  <section class="panel hero reveal" style="--i: 2">
+    <p class="tldr">Futures are unchanged from Friday&#39;s close (NQ 31108.75, ES 7859.75) with no overnight trade yet, VIX is low at 14.84, and today&#39;s calendar is empty, so AI-earnings and credit headlines are likely to drive the open.</p>
+    <div class="badges">
+      <div class="badge up">
+        <span class="k">BIAS</span>
+        <span class="v">NEUTRAL ↑</span>
+      </div>
+      <div class="badge flat">
+        <span class="k">SENTIMENT</span>
+        <span class="v">MIXED</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel reveal" style="--i: 3">
+    <h2>Market snapshot</h2>
+    <div class="table-wrap">
+      <table class="prices">
+        <thead>
+          <tr><th>Instrument</th><th class="r">Last</th><th class="r">Change</th>
+              <th>Prior session range</th><th class="r">Overnight H / L</th><th class="r">5-day H / L</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Instrument"><span class="sym">NQ=F<small>Nasdaq-100 E-mini futures</small></span></td>
+            <td data-label="Last" class="r"><span class="last num">31,108.75</span></td>
+            <td data-label="Change" class="r"><span class="chg flat"><span class="arrow">■</span>+0.00 (+0.00%)</span></td>
+            <td data-label="Prior range" class="range">
+              <div class="track"><span class="marker" style="left: 49.7%"></span></div>
+              <div class="range-labels"><span>30,953.00</span><span>31,266.50</span></div>
+            </td>
+            <td data-label="Overnight H / L" class="r num">— / —</td>
+            <td data-label="5-day H / L" class="r num">31,616.50 / 30,792.00</td>
+          </tr>
+          <tr>
+            <td data-label="Instrument"><span class="sym">ES=F<small>S&amp;P 500 E-mini futures</small></span></td>
+            <td data-label="Last" class="r"><span class="last num">7,859.75</span></td>
+            <td data-label="Change" class="r"><span class="chg flat"><span class="arrow">■</span>+0.00 (+0.00%)</span></td>
+            <td data-label="Prior range" class="range">
+              <div class="track"><span class="marker" style="left: 79.9%"></span></div>
+              <div class="range-labels"><span>7,817.00</span><span>7,870.50</span></div>
+            </td>
+            <td data-label="Overnight H / L" class="r num">— / —</td>
+            <td data-label="5-day H / L" class="r num">7,897.50 / 7,760.25</td>
+          </tr>
+          <tr>
+            <td data-label="Instrument"><span class="sym">^VIX<small>CBOE Volatility Index</small></span></td>
+            <td data-label="Last" class="r"><span class="last num">14.84</span></td>
+            <td data-label="Change" class="r"><span class="chg flat"><span class="arrow">■</span>+0.00 (+0.00%)</span></td>
+            <td data-label="Prior range" class="range">
+              <div class="track"><span class="marker" style="left: 12.3%"></span></div>
+              <div class="range-labels"><span>14.77</span><span>15.34</span></div>
+            </td>
+            <td data-label="Overnight H / L" class="r num">— / —</td>
+            <td data-label="5-day H / L" class="r num">16.46 / 14.77</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel reveal" style="--i: 4">
+    <h2>Overnight summary</h2>
+    <p>Nothing has traded since Friday&#39;s close, so NQ and ES are flat at 31108.75 and 7859.75. Weekend news was dominated by AI themes: an AI credit scare hitting Broadcom and Oracle, with Nvidia holding up, and TSMC and ASML earnings coming up. Commentary from Buffett and Citi was cautious about valuations and inflation.</p>
+  </section>
+
+  <section class="panel reveal" style="--i: 5">
+    <h2>Key levels</h2>
+    <div class="ladders">
+      <div class="ladder">
+        <h3>NQ <span>30,792.00 → 31,616.50</span></h3>
+        <div class="rail">
+          <span class="tick down" style="left: 0.0%" title="30,792.00 5-day low"></span>
+          <span class="tick down" style="left: 19.5%" title="30,953.00 Prior day low"></span>
+          <span class="tick now" style="left: 38.4%" data-price="31,108.75" title="31,108.75 Last · Prior close / last"></span>
+          <span class="tick up" style="left: 57.6%" title="31,266.50 Prior day high"></span>
+          <span class="tick up" style="left: 100.0%" title="31,616.50 5-day high"></span>
+        </div>
+        <div class="rungs">
+          <span class="rung down"><span class="p">30,792.00</span><span class="l">5-day low</span></span>
+          <span class="rung down"><span class="p">30,953.00</span><span class="l">Prior day low</span></span>
+          <span class="rung now"><span class="p">31,108.75</span><span class="l">Last · Prior close / last</span></span>
+          <span class="rung up"><span class="p">31,266.50</span><span class="l">Prior day high</span></span>
+          <span class="rung up"><span class="p">31,616.50</span><span class="l">5-day high</span></span>
+        </div>
+      </div>
+      <div class="ladder">
+        <h3>ES <span>7,760.25 → 7,897.50</span></h3>
+        <div class="rail">
+          <span class="tick down" style="left: 0.0%" title="7,760.25 5-day low"></span>
+          <span class="tick down" style="left: 41.3%" title="7,817.00 Prior day low"></span>
+          <span class="tick now" style="left: 72.5%" data-price="7,859.75" title="7,859.75 Last · Prior close / last"></span>
+          <span class="tick up" style="left: 80.3%" title="7,870.50 Prior day high"></span>
+          <span class="tick up" style="left: 100.0%" title="7,897.50 5-day high"></span>
+        </div>
+        <div class="rungs">
+          <span class="rung down"><span class="p">7,760.25</span><span class="l">5-day low</span></span>
+          <span class="rung down"><span class="p">7,817.00</span><span class="l">Prior day low</span></span>
+          <span class="rung now"><span class="p">7,859.75</span><span class="l">Last · Prior close / last</span></span>
+          <span class="rung up"><span class="p">7,870.50</span><span class="l">Prior day high</span></span>
+          <span class="rung up"><span class="p">7,897.50</span><span class="l">5-day high</span></span>
+        </div>
+      </div>
+    </div>
+    <p class="legend">Low → high · <span class="up">support</span> below last · <span class="down">resistance</span> above · <span class="flat">■ last</span></p>
+  </section>
+
+  <section class="panel reveal" style="--i: 6">
+    <h2>Scheduled events · ET</h2>
+    <p class="empty">No medium/high-impact US events scheduled.</p>
+  </section>
+
+  <section class="panel reveal" style="--i: 7">
+    <h2>Top news</h2>
+    <ul class="news">
+      <li><strong>Why Nvidia&#39;s stock is dodging the AI credit scare crushing Broadcom and Oracle</strong><span class="src">MarketWatch Bulletins</span><p>AI credit worries are hitting big Nasdaq names such as Broadcom and Oracle, which could weigh on NQ, while Nvidia is holding up.</p></li>
+      <li><strong>Dow Jones Futures: S&amp;P 500, Nasdaq Near Highs; ASML, Nvidia&#39;s Chipmaker Taiwan Semi To Kick Off AI Earnings</strong><span class="src">Yahoo Finance</span><p>The indices are near highs, and the TSMC and ASML results will show whether the AI pullback is a buying opportunity.</p></li>
+      <li><strong>Citi issues stark stock market call as a 1970s signal returns</strong><span class="src">Yahoo Finance</span><p>A warning about inflation-era signals adds to the valuation and rate risk.</p></li>
+      <li><strong>Warren Buffett warns of a reality check coming for stock investors</strong><span class="src">Yahoo Finance</span><p>Cautious sentiment from a prominent investor while indices sit near highs.</p></li>
+      <li><strong>Vance says Microsoft replaced laid-off workers with foreign hires</strong><span class="src">CNBC Top News</span><p>The administration barred Microsoft and seven other firms from sponsoring green cards, which is a headline risk for mega-cap tech.</p></li>
+    </ul>
+  </section>
+
+  <div class="split">
+    <section class="panel call call-flat reveal" style="--i: 8">
+      <h2>Sentiment <span class="tag flat">MIXED</span></h2>
+      <p>Indices are near highs and the VIX is low at 14.84, but AI credit worries and valuation warnings from Buffett and Citi offset that.</p>
+    </section>
+    <section class="panel call call-up reveal" style="--i: 9">
+      <h2>Bias <span class="tag up">NEUTRAL ↑</span></h2>
+      <p>The VIX is low and falling, and price closed in the upper half of Friday&#39;s range near the weekly highs, while the AI credit scare and an empty calendar keep conviction limited.</p>
+    </section>
+  </div>
+
+  <section class="panel reveal" style="--i: 10">
+    <h2>Risks</h2>
+    <ul class="bullets"><li>AI credit stress spreading from Broadcom and Oracle to Nvidia and the wider Nasdaq</li><li>Weak TSMC or ASML results or guidance</li><li>Inflation or rate worries after Citi&#39;s warning</li><li>A VIX jump above 16.46, the weekly high</li><li>With no data due, a thin session could produce an outsized move on headlines</li></ul>
+  </section>
+
+
+  <footer>Generated 2026-10-10 18:08 EDT · claude-sonnet-5-5 · Research context only — not investment advice.</footer>
+</main>
+</body>
+</html>
