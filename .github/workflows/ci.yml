@@ -49,9 +49,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # scan the full history, not just the latest commit
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # The official image scans the whole history. (gitleaks-action@v2 computes a
+      # `<first-commit>^..HEAD` range on a brand-new branch, which fails on a root commit.)
+      - name: gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.28.0 \
+            git /repo --redact --verbose --exit-code 1
 
   docker:
     name: Docker build
