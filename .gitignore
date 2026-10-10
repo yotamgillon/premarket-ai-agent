@@ -24,3 +24,6 @@ htmlcov/
 
 # Local scratch output (the committed example report lives under reports/)
 reports/_scratch/
+
+# Local run history (grows with every run)
+reports/runs.jsonl

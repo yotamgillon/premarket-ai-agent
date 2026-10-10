@@ -18,7 +18,11 @@ FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 
 class AgentError(RuntimeError):
-    """The agent could not produce a report."""
+    """The agent could not produce a report. Carries the tokens spent before failing."""
+
+    def __init__(self, message: str, usage: "Usage | None" = None) -> None:
+        super().__init__(message)
+        self.usage = usage
 
 
 class ToolExecutor(Protocol):
@@ -37,6 +41,14 @@ class Usage:
         self.output_tokens += usage.output_tokens
         self.cache_read_input_tokens += usage.cache_read_input_tokens or 0
         self.cache_creation_input_tokens += usage.cache_creation_input_tokens or 0
+
+    def as_dict(self) -> dict[str, int]:
+        return {
+            "input": self.input_tokens,
+            "output": self.output_tokens,
+            "cache_read": self.cache_read_input_tokens,
+            "cache_write": self.cache_creation_input_tokens,
+        }
 
 
 @dataclass
@@ -88,9 +100,9 @@ def run_agent(
         )
 
         if response.stop_reason == "refusal":
-            raise AgentError(f"model declined the request: {response.stop_details}")
+            raise AgentError(f"model declined the request: {response.stop_details}", usage)
         if response.stop_reason == "max_tokens":
-            raise AgentError("response hit max_tokens before finishing")
+            raise AgentError("response hit max_tokens before finishing", usage)
 
         if response.stop_reason == "tool_use":
             messages.append({"role": "assistant", "content": response.content})
@@ -114,7 +126,7 @@ def run_agent(
 
         report = response.parsed_output
         if report is None:
-            raise AgentError(f"no structured report (stop_reason={response.stop_reason})")
+            raise AgentError(f"no structured report (stop_reason={response.stop_reason})", usage)
         return AgentResult(
             report=report,
             model=response.model,
@@ -123,4 +135,4 @@ def run_agent(
             tool_calls=tool_calls,
         )
 
-    raise AgentError(f"no report after {MAX_ITERATIONS} turns")
+    raise AgentError(f"no report after {MAX_ITERATIONS} turns", usage)
