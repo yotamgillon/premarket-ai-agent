@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     # Claude
     anthropic_api_key: SecretStr | None = None
     claude_model: str = "claude-opus-5-5"
+    claude_effort: str = "medium"  # low | medium | high | xhigh | max
 
     # General
     reports_dir: Path = Path("reports")

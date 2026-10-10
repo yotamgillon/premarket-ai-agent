@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from premarket_agent.__main__ import main
-from premarket_agent.config import Settings
+from premarket_agent.config import Settings, get_settings
 
 
 @pytest.fixture(autouse=True)
@@ -12,6 +12,7 @@ def isolated_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.chdir(tmp_path)
     for var in ("ANTHROPIC_API_KEY", "CLAUDE_MODEL", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"):
         monkeypatch.delenv(var, raising=False)
+    get_settings.cache_clear()
 
 
 def test_defaults() -> None:
@@ -39,5 +40,10 @@ def test_secret_not_leaked_in_repr(monkeypatch: pytest.MonkeyPatch) -> None:
     assert "sk-super-secret" not in repr(Settings())
 
 
-def test_cli_runs() -> None:
-    assert main(["--date", "2026-10-12"]) == 0
+def test_cli_skips_non_trading_day(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["--date", "2026-10-10"]) == 0  # Saturday
+    assert "not a trading day" in capsys.readouterr().out
+
+
+def test_cli_requires_api_key() -> None:
+    assert main(["--date", "2026-10-12"]) == 2

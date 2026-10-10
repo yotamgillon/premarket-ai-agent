@@ -5,6 +5,7 @@ description = "AI agent that writes a pre-market research report for NQ/ES futur
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "anthropic>=1.13.0",
     "feedparser>=6.0.14",
     "holidays>=0.106",
     "httpx>=0.28.1",
