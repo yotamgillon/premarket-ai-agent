@@ -1,0 +1,15 @@
+# Pre-Market AI Agent schedule.
+# The system timezone is Asia/Jerusalem (set by setup.sh), so "15:00" means Israel time
+# all year round, including when Israel and the US switch daylight saving time on
+# different dates.
+#
+# m  h  dom mon dow   command
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+0 15 * * 1-5  __APP_DIR__/deploy/ec2/run.sh
+
+# Weekly cleanup so the small disk never fills up. Only *dangling* images and old build
+# cache: `docker system prune -a` would also delete the agent image (it's "unused"
+# between runs) and force a slow rebuild at 15:00.
+30 3 * * 6    docker image prune -f >/dev/null 2>&1; docker builder prune -f --filter "until=168h" >/dev/null 2>&1
