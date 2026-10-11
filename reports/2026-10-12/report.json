@@ -1,21 +1,21 @@
 {
-  "tldr": "Futures are unchanged from Friday's close (NQ 31108.75, ES 7859.75) with no overnight trade yet, VIX is low at 14.84, and today's calendar is empty, so AI-earnings and credit headlines are likely to drive the open.",
-  "overnight_summary": "Nothing has traded since Friday's close, so NQ and ES are flat at 31108.75 and 7859.75. Weekend news was dominated by AI themes: an AI credit scare hitting Broadcom and Oracle, with Nvidia holding up, and TSMC and ASML earnings coming up. Commentary from Buffett and Citi was cautious about valuations and inflation.",
+  "tldr": "Futures sit unchanged at Friday's close with no overnight trade yet. There are no scheduled US data releases today, and AI-earnings and credit worries are the main drivers.",
+  "overnight_summary": "No overnight range has printed yet, so NQ (31108.75) and ES (7859.75) are flat at Friday's close. The VIX closed at 14.84, near its 5-day low of 14.77. Weekend headlines centered on an AI credit scare hitting Broadcom and Oracle while Nvidia held up, plus ASML and TSMC earnings coming this week.",
   "key_levels": [
     {
       "instrument": "NQ",
       "level": 31266.5,
-      "label": "Prior day high"
+      "label": "Prior session high"
     },
     {
       "instrument": "NQ",
       "level": 31108.75,
-      "label": "Prior close / last"
+      "label": "Prior close"
     },
     {
       "instrument": "NQ",
       "level": 30953.0,
-      "label": "Prior day low"
+      "label": "Prior session low"
     },
     {
       "instrument": "NQ",
@@ -30,17 +30,17 @@
     {
       "instrument": "ES",
       "level": 7870.5,
-      "label": "Prior day high"
+      "label": "Prior session high"
     },
     {
       "instrument": "ES",
       "level": 7859.75,
-      "label": "Prior close / last"
+      "label": "Prior close"
     },
     {
       "instrument": "ES",
       "level": 7817.0,
-      "label": "Prior day low"
+      "label": "Prior session low"
     },
     {
       "instrument": "ES",
@@ -58,39 +58,38 @@
     {
       "title": "Why Nvidia's stock is dodging the AI credit scare crushing Broadcom and Oracle",
       "source": "MarketWatch Bulletins",
-      "why_it_matters": "AI credit worries are hitting big Nasdaq names such as Broadcom and Oracle, which could weigh on NQ, while Nvidia is holding up."
+      "why_it_matters": "AI-related credit stress is hitting some mega-cap tech names but not others. That could cause dispersion inside NQ."
     },
     {
-      "title": "Dow Jones Futures: S&P 500, Nasdaq Near Highs; ASML, Nvidia's Chipmaker Taiwan Semi To Kick Off AI Earnings",
+      "title": "Dow Jones Futures: S&P 500, Nasdaq Near Highs; ASML, Taiwan Semi To Kick Off AI Earnings",
       "source": "Yahoo Finance",
-      "why_it_matters": "The indices are near highs, and the TSMC and ASML results will show whether the AI pullback is a buying opportunity."
+      "why_it_matters": "ASML and TSMC results this week may decide whether the AI pullback is a buying opportunity. Indexes are near highs."
     },
     {
       "title": "Citi issues stark stock market call as a 1970s signal returns",
       "source": "Yahoo Finance",
-      "why_it_matters": "A warning about inflation-era signals adds to the valuation and rate risk."
+      "why_it_matters": "Inflation-era warning signals could weigh on valuations and sentiment."
     },
     {
       "title": "Warren Buffett warns of a reality check coming for stock investors",
       "source": "Yahoo Finance",
-      "why_it_matters": "Cautious sentiment from a prominent investor while indices sit near highs."
+      "why_it_matters": "Cautious commentary on stretched valuations adds to the AI-bubble debate."
     },
     {
-      "title": "Vance says Microsoft replaced laid-off workers with foreign hires",
-      "source": "CNBC Top News",
-      "why_it_matters": "The administration barred Microsoft and seven other firms from sponsoring green cards, which is a headline risk for mega-cap tech."
+      "title": "'Big Short' investors split over the AI risk that matters most",
+      "source": "Yahoo Finance",
+      "why_it_matters": "The AI-bubble debate keeps tech sentiment sensitive to any negative headline."
     }
   ],
   "sentiment": "mixed",
-  "sentiment_rationale": "Indices are near highs and the VIX is low at 14.84, but AI credit worries and valuation warnings from Buffett and Citi offset that.",
+  "sentiment_rationale": "The VIX is low at 14.84 and indexes are near highs, but the news flow includes an AI credit scare, valuation warnings and inflation-signal worries.",
   "bias": "neutral_up",
-  "bias_rationale": "The VIX is low and falling, and price closed in the upper half of Friday's range near the weekly highs, while the AI credit scare and an empty calendar keep conviction limited.",
+  "bias_rationale": "ES closed in the upper part of Friday's range (79.9%) with a low VIX and indexes near highs, but NQ is mid-range (49.7%) and the AI credit worries cap conviction.",
   "risks": [
-    "AI credit stress spreading from Broadcom and Oracle to Nvidia and the wider Nasdaq",
-    "Weak TSMC or ASML results or guidance",
-    "Inflation or rate worries after Citi's warning",
-    "A VIX jump above 16.46, the weekly high",
-    "With no data due, a thin session could produce an outsized move on headlines"
+    "The AI credit scare spreads from Broadcom and Oracle to other mega-cap tech and pulls NQ below the 30953 prior low.",
+    "Weak ASML or TSMC earnings this week.",
+    "A thin calendar leaves the market open to headline-driven moves.",
+    "A VIX move back above 16 would signal risk-off."
   ],
   "data_gaps": []
 }

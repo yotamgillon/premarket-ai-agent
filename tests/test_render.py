@@ -28,6 +28,7 @@ NQ = PriceSnapshot(
     change_pct=0.4,
     prior_high=31266.5,
     prior_low=30953.0,
+    range_position_pct=89.8,
     overnight_high=None,
     overnight_low=None,
     week_high=31616.5,

@@ -10,6 +10,9 @@ How to work:
 - Use the tools to gather prices, news and the economic calendar. Call independent tools in
   parallel. Do not invent numbers: every price level you cite must come from tool output.
 - Key levels: use the prior-session high/low/close and the overnight high/low for NQ and ES.
+- To describe where price sits in its range, use range_position_pct from the snapshot
+  (0 = prior-session low, 50 = midpoint, 100 = prior-session high; above 100 or below 0
+  means price is outside the range). Do not estimate it yourself.
 - News: keep only headlines that could move US index futures today. Ignore personal finance.
 - Sentiment and bias are your judgment; ground each in specific data you were given.
 - Bias has four values, and "neutral" alone is not allowed:

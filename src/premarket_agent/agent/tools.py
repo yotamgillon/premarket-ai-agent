@@ -16,8 +16,9 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
     {
         "name": "get_market_snapshot",
         "description": (
-            "Latest price, change vs prior close, prior-session high/low, overnight "
-            "high/low and 5-day range for NQ and ES futures and the VIX."
+            "Latest price, change vs prior close, prior-session high/low, where the price "
+            "sits in that range (range_position_pct), overnight high/low and 5-day range "
+            "for NQ and ES futures and the VIX."
         ),
         "strict": True,
         "input_schema": {

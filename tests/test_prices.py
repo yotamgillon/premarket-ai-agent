@@ -55,6 +55,24 @@ def test_build_snapshot_monday_includes_weekend_reopen() -> None:
     assert snap.week_high == 112.0
     assert snap.week_low == 95.0
     assert snap.last_bar_time == datetime(2026, 10, 12, 7, 45, tzinfo=NY_TZ)
+    # last 111 vs Friday's range 98..110 -> above the prior high
+    assert snap.range_position_pct == pytest.approx(108.3)
+
+
+@pytest.mark.parametrize(
+    ("last", "expected"),
+    [(98.0, 0.0), (104.0, 50.0), (110.0, 100.0), (95.0, -25.0), (111.5, 112.5)],
+)
+def test_range_position_pct_is_not_clamped(last: float, expected: float) -> None:
+    intraday = _intraday([("2026-10-12 07:45", last, last, last)])
+    snap = prices.build_snapshot("NQ=F", DAILY, intraday, MONDAY_8AM)
+    assert snap.range_position_pct == expected
+
+
+def test_range_position_pct_none_for_flat_range() -> None:
+    flat = _daily([("2026-10-09", 100.0, 100.0, 100.0), ("2026-10-12", 101.0, 99.0, 100.5)])
+    snap = prices.build_snapshot("NQ=F", flat, INTRADAY, MONDAY_8AM)
+    assert snap.range_position_pct is None
 
 
 def test_build_snapshot_no_overnight_bars() -> None:

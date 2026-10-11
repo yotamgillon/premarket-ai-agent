@@ -29,6 +29,9 @@ class PriceSnapshot(BaseModel):
     change_pct: float
     prior_high: float
     prior_low: float
+    # Where `last` sits in the prior session's range: 0 = prior low, 100 = prior high.
+    # Not clamped: >100 / <0 means price has broken out of the range.
+    range_position_pct: float | None
     overnight_high: float | None
     overnight_low: float | None
     week_high: float
@@ -64,6 +67,11 @@ def build_snapshot(
     prev_close = float(prior["Close"])
     change = last - prev_close
     week = daily.tail(5)
+    prior_high, prior_low = float(prior["High"]), float(prior["Low"])
+    prior_range = prior_high - prior_low
+    range_position_pct = (
+        round((last - prior_low) / prior_range * 100, 1) if prior_range > 0 else None
+    )
 
     return PriceSnapshot(
         symbol=symbol,
@@ -74,8 +82,9 @@ def build_snapshot(
         prev_close=round(prev_close, 2),
         change=round(change, 2),
         change_pct=round(change / prev_close * 100, 2),
-        prior_high=round(float(prior["High"]), 2),
-        prior_low=round(float(prior["Low"]), 2),
+        prior_high=round(prior_high, 2),
+        prior_low=round(prior_low, 2),
+        range_position_pct=range_position_pct,
         overnight_high=round(float(overnight["High"].max()), 2) if not overnight.empty else None,
         overnight_low=round(float(overnight["Low"].min()), 2) if not overnight.empty else None,
         week_high=round(float(week["High"].max()), 2),
